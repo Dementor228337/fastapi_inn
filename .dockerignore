@@ -1,0 +1,36 @@
+# --- Git ---
+.git
+.gitignore
+
+# --- Python и кэш (Windows-шный venv сломает Linux-контейнер) ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+*.egg-info/
+
+# --- Результаты парсинга ---
+files/*
+
+
+# --- Playwright ---
+.ms-playwright/
+playwright-report/
+test-results/
+
+
+# --- Отладка и IDE ---
+.idea/
+.vscode/
+Thumbs.db
+
+# --- Docker-файлы ---
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# --- README и документация ---
+README.md
+docs/
