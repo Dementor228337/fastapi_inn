@@ -1,6 +1,6 @@
 from pathlib import Path
 from openpyxl import Workbook
-
+from src.logger_core.logging_config import logger
 
 
 
@@ -9,6 +9,9 @@ def write_excel(
         path: Path
     ) -> Path:
     """Пишет список словарей в Excel-файл."""
+
+    logger.debug(f"Запись Excel: {len(rows)} строк → {path}")
+
     path.parent.mkdir(parents=True, exist_ok=True)
 
     wb = Workbook()
@@ -18,4 +21,5 @@ def write_excel(
             ws.append([key, value])
 
     wb.save(path)
+    logger.debug(f"Excel-файл записан: {path.name}")
     return path

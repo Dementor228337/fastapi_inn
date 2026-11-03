@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
 from playwright.async_api import async_playwright, Page, Browser, BrowserContext, Playwright
-
+from src.logger_core.logging_config import logger
 from src.core.config import settings
 
 
@@ -35,6 +35,7 @@ class BrowserManager:
         Запускает Playwright, браузер и создает новую страницу.
         :return: Объект класса Page.
         """
+        logger.debug("Запуск Playwright и Chromium (headless=%s)", settings.headless)
         self._playwright = await async_playwright().start()
 
         self._browser = await self._playwright.chromium.launch(
@@ -45,6 +46,7 @@ class BrowserManager:
                 "--disable-setuid-sandbox",
             ]
         )
+        logger.debug("Браузер запущен")
         self._browser_context = await self._browser.new_context(
             ignore_https_errors=settings.ignore_https_errors,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -60,7 +62,9 @@ class BrowserManager:
 
         self._browser_context.set_default_timeout(settings.default_timeout_ms)
 
-        return await self._browser_context.new_page()
+        page = await self._browser_context.new_page()
+        logger.debug("Создана новая вкладка (Page)")
+        return page
 
     async def close(self) -> None:
         """

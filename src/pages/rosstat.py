@@ -1,6 +1,6 @@
 from playwright.async_api import Page, Locator
 from src.core.config import settings
-
+from src.logger_core.logging_config import logger
 
 class RosstatMainPage:
     URL = settings.base_url
@@ -42,6 +42,8 @@ class RosstatMainPage:
         :return: None.
         """
 
+        logger.debug(f"Открытие главной страницы Росстата: {self.URL}")
+
         await self.page.route(
             "**/browser-updater/**",
             lambda route: route.abort()
@@ -55,13 +57,19 @@ class RosstatMainPage:
         try:
             cookie_btn = self.page.get_by_role("button", name="Я согласен")
             if await cookie_btn.is_visible(timeout=1000):
+                logger.debug("Найдена кнопка согласия с cookie, нажимаем")
                 await cookie_btn.click()
 
         except Exception as e:
-            print(f"Parsing error: {e}")
+            logger.error(
+                f"Ошибка при обработке cookie-баннера на главной странице: {e}",
+                exc_info=True
+            )
             raise
 
+        logger.debug("Ожидание появления ссылки 'Респондентам'")
         await self.respondents_link.wait_for(state="visible", timeout=20000)
+        logger.debug("Главная страница готова к навигации")
 
 
     async def go_to_respondents(self) -> None:
@@ -160,6 +168,9 @@ class RosstatInnPage:
 
         rows = self.result_rows
         count = await rows.count()
+
+        logger.debug(f"Найдено строк в таблице результатов: {count}")
+
         result = []
         for i in range(count):
             row = rows.nth(i)
@@ -178,6 +189,9 @@ class RosstatInnPage:
                 values.append(text.strip())
 
             result.append({row_name: '; '.join(values)})
+
+        logger.debug(f"Извлечено {len(result)} строк данных из таблицы")
+
         return result
 
 
