@@ -2,6 +2,7 @@
 .git
 .gitignore
 
+
 # --- Python и кэш (Windows-шный venv сломает Linux-контейнер) ---
 __pycache__/
 *.py[cod]
@@ -9,6 +10,13 @@ __pycache__/
 venv/
 env/
 *.egg-info/
+
+
+# --- Environment ---
+.env
+.env.local
+.env.*.local
+
 
 # --- Результаты парсинга ---
 files/*
@@ -25,11 +33,13 @@ test-results/
 .vscode/
 Thumbs.db
 
+
 # --- Docker-файлы ---
 Dockerfile
 .dockerignore
 docker-compose.yml
 docker-compose.*.yml
+
 
 # --- README и документация ---
 README.md

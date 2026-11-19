@@ -3,7 +3,7 @@ from src.core.config import settings
 from src.logger_core.logging_config import logger
 
 class RosstatMainPage:
-    URL = settings.base_url
+    URL = settings.browser.base_url
 
     """
     Главная страница сайта Росстата.

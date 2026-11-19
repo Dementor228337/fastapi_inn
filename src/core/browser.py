@@ -35,11 +35,11 @@ class BrowserManager:
         Запускает Playwright, браузер и создает новую страницу.
         :return: Объект класса Page.
         """
-        logger.debug("Запуск Playwright и Chromium (headless=%s)", settings.headless)
+        logger.debug("Запуск Playwright и Chromium (headless=%s)", settings.browser.headless)
         self._playwright = await async_playwright().start()
 
         self._browser = await self._playwright.chromium.launch(
-            headless=settings.headless,
+            headless=settings.browser.headless,
             args=[
                 "--disable-blink-features=AutomationControlled",
                 "--no-sandbox",
@@ -48,7 +48,7 @@ class BrowserManager:
         )
         logger.debug("Браузер запущен")
         self._browser_context = await self._browser.new_context(
-            ignore_https_errors=settings.ignore_https_errors,
+            ignore_https_errors=settings.browser.ignore_https_errors,
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
                        "AppleWebKit/537.36 (KHTML, like Gecko) "
                        "Chrome/122.0.0.0 Safari/537.36"
@@ -60,7 +60,7 @@ class BrowserManager:
                     });
                 """)
 
-        self._browser_context.set_default_timeout(settings.default_timeout_ms)
+        self._browser_context.set_default_timeout(settings.browser.default_timeout_ms)
 
         page = await self._browser_context.new_page()
         logger.debug("Создана новая вкладка (Page)")

@@ -21,8 +21,9 @@ class RosstatService:
 
 
     async def get_results_by_inn(
-            self, inn: str
-    ) -> list[dict[str, str]]:
+            self,
+            inn: str,
+        ) -> list[dict[str, str]]:
         """
         Асинхронная функция для получения информации по ИНН в виде списка словарей.
         :param inn: Инн в виде строки.

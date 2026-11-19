@@ -4,7 +4,7 @@ from typing import AsyncIterator
 from playwright.async_api import Playwright, Browser, BrowserContext, async_playwright, Page
 import asyncio
 
-from core.config import settings
+from src.core.config import settings
 
 
 class BrowserPool:
@@ -21,7 +21,7 @@ class BrowserPool:
     async def start(self) -> None:
         self._playwright = await async_playwright().start()
         self._browser = await self._playwright.chromium.launch(
-            headless=settings.headless,
+            headless=settings.browser.headless,
         )
 
     async def stop(self) -> None:
@@ -41,9 +41,9 @@ class BrowserPool:
 
         async with self._semaphore:
             context = await self._browser.new_context(
-                ignore_https_errors=settings.ignore_https_errors,
+                ignore_https_errors=settings.browser.ignore_https_errors,
             )
-            context.set_default_timeout(settings.default_timeout_ms)
+            context.set_default_timeout(settings.browser.default_timeout_ms)
 
             try:
                 page = await context.new_page()

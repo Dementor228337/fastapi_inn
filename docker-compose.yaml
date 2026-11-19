@@ -4,6 +4,7 @@ services:
       context: .
     container_name: inn_app
     command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    env_file: .env.example
     environment:
       PYTHONPATH: /app
     ports:
@@ -11,3 +12,66 @@ services:
     volumes:
       - ./src:/app/src
       - ./files:/app/files
+    depends_on:
+      - db
+      - kafka
+
+  kafka:
+    image: apache/kafka:latest
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      # Идентификаторы и роли
+      KAFKA_NODE_ID: 0
+      KAFKA_PROCESS_ROLES: broker,controller
+
+      # Слушатели
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092,CONTROLLER://:9093
+
+      # Внутри Docker - kafka:9092, с хоста - localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://localhost:29092
+
+      # Протоколы безопасности
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+
+      # Какой слушатель использовать для связи между брокерами
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+
+      # Настройки контроллера (KRaft)
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 0@kafka:9093
+
+      # Факторы репликации для одного узла
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+      # Количество партиций по умолчанию для новых топиков
+      KAFKA_NUM_PARTITIONS: 1
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_DB=inn_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5432:5432"
+    volumes:
+        - postgres_data:/var/lib/postgresql/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: inn_kafka_ui
+    ports:
+      - "8080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:9092
+    depends_on:
+      - kafka
+
+volumes:
+  postgres_data:

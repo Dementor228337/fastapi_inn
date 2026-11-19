@@ -10,12 +10,21 @@ dist/
 venv/
 env/
 
+
+# --- Environment ---
+.env
+.env.local
+.env.*.local
+
+
 # --- Poetry ---
 poetry.toml
+
 
 # --- Результаты работы (Excel-файлы) ---
 files/*
 !files/.gitkeep
+
 
 # --- IDE / OS ---
 .idea/
